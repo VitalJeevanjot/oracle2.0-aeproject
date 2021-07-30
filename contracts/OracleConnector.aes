@@ -79,29 +79,7 @@ contract OracleConnector =
     public entrypoint getQuery(query_id: bytes(32)) : option(oracle_query(string, string)) =
         Map.lookup(query_id, state.queries)
         
-    
-    // Changes - Deploying new oracle instead of making below changes & Not required anymore, Using different approach
 
-    // stateful entrypoint changeBaseFee(new_fee: int) : bool =
-    //     require(state.owners[Call.caller] == true, "Only owners can do this transaction")
-    //     put(state{base_fee = new_fee})
-    //     true
-    
-    // stateful entrypoint changeTtl(ttl: int) : bool =
-    //     require(state.owners[Call.caller] == true, "Only owners can do this transaction")
-    //     put(state{ttl = ttl})
-    //     true
-    
-    // stateful entrypoint changeQttl(qttl: int) : bool =
-    //     require(state.owners[Call.caller] == true, "Only owners can do this transaction")
-    //     put(state{qttl = qttl})
-    //     true
-    
-    // stateful entrypoint changeRttl(rttl: int) : bool =
-    //     require(state.owners[Call.caller] == true, "Only owners can do this transaction")
-    //     put(state{rttl = rttl})
-    //     true
-    
 
     stateful entrypoint withdrawFunds(send_to: address, amount: int) : bool =
         require(state.owners[Call.caller] == true, "Only owners can do this transaction")
