@@ -38,7 +38,7 @@ contract OraclesManager =
         Chain.event(OracleAddedOrChanged(name, _addr))
         true
 
-    stateful entrypoint listOracleAddresses() : list(string * address) =
+    public entrypoint listOracleAddresses() : list(string * address) =
          Map.to_list(state.addr)
 
     stateful entrypoint setContractOracle(oracle_id: string) : bool =
@@ -47,9 +47,9 @@ contract OraclesManager =
         Chain.event(OracleAddedOrChanged(oracle_id, Call.caller))
         true
     
-    stateful entrypoint getContractOracle(contract_address: address) : string =
+    public entrypoint getContractOracle(contract_address: address) : string =
         require(Address.is_contract(Call.caller), "Only smart contracts can call it")
         state.contract_oracle[Call.caller]
     
-    stateful entrypoint getListOfOracles() : list(string) =
+    public entrypoint getListOfOracles() : list(string) =
         state.oracles
