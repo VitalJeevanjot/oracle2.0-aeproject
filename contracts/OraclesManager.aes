@@ -1,4 +1,8 @@
 contract OraclesManager =
+    datatype event = OracleAdded(string, address) 
+                     | OracleAddedOrChanged(string, address)
+                     | OwnerChangedFrom_To(address, address)
+                     | SetContractOracle(string, address)
     record state = {
         addr: map(string, address),
         oracles: list(string),
@@ -6,7 +10,9 @@ contract OraclesManager =
         owner: address
      }
 
-    stateful entrypoint init(oracle_name: string, _addr: address) = { 
+    stateful entrypoint init(oracle_name: string, _addr: address) =
+        Chain.event(OracleAdded(oracle_name, _addr))
+        { 
             addr = {[oracle_name] = _addr},
             oracles = [oracle_name],
             contract_oracle = {},
@@ -14,7 +20,9 @@ contract OraclesManager =
 
     stateful entrypoint changeOwner(new_owner: address) : bool = 
         require(state.owner == Call.caller, "Only owner can call it")
+        let old_owner = state.owner
         put(state{owner = new_owner})
+        Chain.event(OwnerChangedFrom_To(old_owner, state.owner))
         true
     
     public entrypoint getOwner() : address =
@@ -27,6 +35,7 @@ contract OraclesManager =
         require(state.owner == Call.caller, "Only owner can call it")
         put(state{addr[name] = _addr})
         put(state{oracles @ o = name :: o})
+        Chain.event(OracleAddedOrChanged(name, _addr))
         true
 
     stateful entrypoint listOracleAddresses() : list(string * address) =
@@ -35,6 +44,7 @@ contract OraclesManager =
     stateful entrypoint setContractOracle(oracle_id: string) : bool =
         require(Address.is_contract(Call.caller), "Only smart contracts can call it")
         put(state{contract_oracle[Call.caller] = oracle_id})
+        Chain.event(OracleAddedOrChanged(oracle_id, Call.caller))
         true
     
     stateful entrypoint getContractOracle(contract_address: address) : string =
