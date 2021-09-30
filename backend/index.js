@@ -7,7 +7,7 @@ const { decodeEvents, SOPHIA_TYPES } = requireESM('@aeternity/aepp-sdk/es/contra
 // import { parseBigNumber, asBigNumber, isBigNumber, ceil } from '@aeternity/aepp-sdk/es/utils/bignumber'
 const OracleContractCode = fs.readFileSync(__dirname + '/../contracts/OracleConnector.aes', 'utf-8');
 // oracle_plain
-const contract_address = "ct_2r3Zn9gLJvsN8W4wD6YekPsvMrb7rESMTFLVg6QvjJpFXbph37"
+const contract_address = "ct_m5jd61zwpXuzeRjJeYVfwpFv6YdQvPqgKSvQMTiP9ihNAG9c7"
 var blake2b = require('blake2b')
 var axios = require('axios')
 var url = "https://mainnet.aeternity.io"
@@ -16,9 +16,12 @@ var Compilerurl = "https://latest.compiler.aepps.com"
 const BigNumber = require('bignumber.js');
 const conf = require('./conf.json')
 
-const keyPair = {
-  "publicKey": "your_pubkey",
-  "secretKey": "your_prkey"
+
+require('dotenv').config()
+
+const keyPair = { // SUPER SECRET, CREATE ENV BEFORE SENDING TO GITHUB... BY JEEVANJOT
+  "publicKey": process.env.PUBLIC_KEY,
+  "secretKey": process.env.PRIVATE_KEY
 }
 var client_node = null
 var contract = null
@@ -81,13 +84,13 @@ async function StartListening () {
           let _respondToQuery = respondToQuery.decodedResult
           console.log("respondToQuery: " + _respondToQuery)
         }
-        catch (e) {
-          console.log("_ErrorM Wrong Request Format by ==" + " : " + _getQueryQuestion)
-          let respondToQuery = await contract.methods.respond(_getQuery, "Wrong Request Format!")
-          let _respondToQuery = respondToQuery.decodedResult
-          console.log("respondToQuery: " + _respondToQuery)
-          console.log(e.message)
-          console.log("/_ErrorM Wrong Request Format ===" + "\n\n")
+        catch(e) {
+            console.log("_ErrorM Wrong Request Format by ==" + " : " + _getQueryQuestion )
+            let respondToQuery = await contract.methods.respond(_getQuery, "Wrong Request Format!")
+            let _respondToQuery = respondToQuery.decodedResult
+            console.log("respondToQuery: " + _respondToQuery)
+            console.log(e.message)
+            console.log("/_ErrorM Wrong Request Format ===" + "\n\n")
         }
 
 
@@ -95,7 +98,7 @@ async function StartListening () {
         queries++
       }
     }
-    getQueries()
+    setTimeout(getQueries, 10000)
   }
   getQueries()
 }
@@ -121,17 +124,18 @@ async function getResult (_args) {
 
   for (let index = 1; index < args.length; index++) { // nested results
     try {
-
-      if (args[index].includes("[")) {
-        let split_b = args[index].split("[")
-        result = result[split_b[0]][split_b[1].charAt(0)]
-      }
-      else {
-        result = result[args[index]]
-      }
-
+      
+    if(args[index].includes("["))
+    {
+      let split_b = args[index].split("[")
+      result = result[split_b[0]][split_b[1].charAt(0)]
     }
-    catch (e) {
+    else {
+      result = result[args[index]]
+    }
+    
+    }
+    catch(e) {
       console.log("_err ========")
       console.log(e.message)
       console.log("/_err ========" + "\n\n")
