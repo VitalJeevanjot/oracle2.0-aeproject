@@ -1,10 +1,11 @@
-contract OracleConnector =
-    payable entrypoint query: (string) => bytes(32)
+contract interface OracleConnector =
+    payable entrypoint query : (string, bool) => string
     entrypoint getAnswer : (bytes(32)) => option(string)
     entrypoint canCallBack: () => bool
     entrypoint getBaseFee: () => int
+    entrypoint getNextQueryID: () => string
 
-contract OraclesManager =
+contract interface OraclesManager =
     entrypoint getAddress : (string) => address
     entrypoint setContractOracle : (string) => bool
     entrypoint getContractOracle : (address) => string
@@ -40,11 +41,14 @@ namespace Say =
     public function getBaseFee() : int =
         set().oracle_connector.getBaseFee()
 
+    public function getNextQueryID() : string =
+        set().oracle_connector.getNextQueryID()
+
     public function getAnswer(query_id: bytes(32)) : option(string) =
         set().oracle_connector.getAnswer(query_id)
 
-    stateful function query(args: string, value_received: int) : bytes(32) =
-        set().oracle_connector.query(args, value = value_received)
+    stateful function query(args: string, require_callback: bool, value_received: int) : string =
+        set().oracle_connector.query(args, require_callback, value = value_received)
 
     public function availableOracles() : list(string) =
         set().oracle_address.getListOfOracles()
