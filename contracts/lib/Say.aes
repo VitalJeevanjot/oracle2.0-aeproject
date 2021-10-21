@@ -8,6 +8,7 @@ contract OraclesManager =
     entrypoint getAddress : (string) => address
     entrypoint setContractOracle : (string) => bool
     entrypoint getContractOracle : (address) => string
+    entrypoint getListOfOracles : () => list(string)
 
 namespace Say =
 
