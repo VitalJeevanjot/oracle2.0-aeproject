@@ -1,6 +1,6 @@
 contract interface OracleConnector =
     payable entrypoint query : (string, bool) => string
-    entrypoint getAnswer : (bytes(32)) => option(string)
+    entrypoint getAnswerByQueryUniqId : (string) => option(string)
     entrypoint canCallBack: () => bool
     entrypoint getBaseFee: () => int
     entrypoint getNextQueryID: () => string
@@ -19,15 +19,15 @@ namespace Say =
       }
     // Must run this to select oracle at init
     public function setOracle(oracle_id: string) : bool =
-        let _oracle_address : OraclesManager = ct_utMHaqF7wtV6fHFkGC8MiJ3zQeCwsviUayRTrpHTCAGMat6GU
+        let _oracle_address : OraclesManager = ct_2fkS2UefdAtrD4gmpYcQbujQJU3iaR1B7FPikeZWQ4xUxqbWhu
         _oracle_address.setContractOracle(oracle_id)
     
     public function getOracleId() : string =
-        let _oracle_address : OraclesManager = ct_utMHaqF7wtV6fHFkGC8MiJ3zQeCwsviUayRTrpHTCAGMat6GU
+        let _oracle_address : OraclesManager = ct_2fkS2UefdAtrD4gmpYcQbujQJU3iaR1B7FPikeZWQ4xUxqbWhu
         _oracle_address.getContractOracle(Call.caller)
 
     public function set() : setup =
-        let _oracle_address : OraclesManager = ct_utMHaqF7wtV6fHFkGC8MiJ3zQeCwsviUayRTrpHTCAGMat6GU
+        let _oracle_address : OraclesManager = ct_2fkS2UefdAtrD4gmpYcQbujQJU3iaR1B7FPikeZWQ4xUxqbWhu
         let _oracle_connector : OracleConnector = Address.to_contract(_oracle_address.getAddress(getOracleId()))
         
         {oracle_address = _oracle_address, oracle_connector = _oracle_connector}
@@ -44,12 +44,11 @@ namespace Say =
     public function getNextQueryID() : string =
         set().oracle_connector.getNextQueryID()
 
-    public function getAnswer(query_id: bytes(32)) : option(string) =
-        set().oracle_connector.getAnswer(query_id)
+    public function getAnswer(query_id: string) : option(string) =
+        set().oracle_connector.getAnswerByQueryUniqId(query_id)
 
     stateful function query(args: string, require_callback: bool, value_received: int) : string =
         set().oracle_connector.query(args, require_callback, value = value_received)
 
     public function availableOracles() : list(string) =
         set().oracle_address.getListOfOracles()
-
