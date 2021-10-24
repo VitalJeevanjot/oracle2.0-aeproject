@@ -41,7 +41,7 @@ contract OracleConnector =
             qttl = 10000,
             rttl = 10000}
          
-    stateful entrypoint createOracle() : oracle(string, string) =
+    stateful function createOracle() : oracle(string, string) =
         let oracle_created : oracle(string, string) = Oracle.register(Contract.address, 0,RelativeTTL(999999))
         Chain.event(OracleCreated(oracle_created, "New oracle created"))
         oracle_created
@@ -76,6 +76,9 @@ contract OracleConnector =
     
     public entrypoint getQueryCallerAddress(uniq_id: string) : address =
         state.query_caller[uniq_id]
+
+    public entrypoint getWhenExpire() : int =
+        Oracle.expiry(state.source_oracle)
     
     public entrypoint getRequestedCallBack(uniq_id: string) : bool =
         state.requested_callback[uniq_id]
